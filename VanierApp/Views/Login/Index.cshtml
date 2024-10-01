@@ -1,0 +1,19 @@
+﻿@model LoginViewModel
+
+<div class="container">
+<h2> Login </h2>
+      <form asp-action="LoginMethod"  method="post">
+          <label>Username</label>
+          <input name="Username" />
+          <label>Password</label>
+          <input name="Password" type="password" />
+          <button>Login</button>
+      </form>
+
+    @if (Model != null && !string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div style="color:red">
+            @Model.ErrorMessage
+        </div>
+    } 
+</div>

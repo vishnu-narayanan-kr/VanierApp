@@ -1,0 +1,13 @@
+﻿@model List<CourseViewModel>
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Student Dashboard</h1>
+    <h2>Courses Enrolled </h2>
+    @foreach (var course in Model)
+    {
+        <a class="btn btn-primary btn-sm" href="">
+            @course.CourseName
+            @course.CourseBlock
+        </a>
+    }
+</div>
