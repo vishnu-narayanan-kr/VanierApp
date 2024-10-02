@@ -1,6 +1,17 @@
 # VanierApp
 
-Create a new Database and add the following script
+## Project Overview
+VanierApp is a web application designed to manage students, teachers, and courses at Vanier College. This app allows users to interact with course content, track enrollment, and manage user roles such as students, teachers, and administrators.
+
+## Database Setup
+To set up the VanierApp database, follow these steps:
+
+1. **Create a new Database**: 
+   Ensure that you have a new database created in your SQL Server instance to store the tables for this application.
+
+2. **Run the following script** to create and populate the necessary tables:
+
+```sql
 -- Create the Users table
 CREATE TABLE Users (
     Id INT PRIMARY KEY IDENTITY(1,1),
@@ -12,12 +23,12 @@ CREATE TABLE Users (
 -- Insert values into Users table
 INSERT INTO Users (Username, Password, UserRole)
 VALUES 
-	('admin123', 'Admin@123', 'A'),
+    ('admin123', 'Admin@123', 'A'),
     ('choo123', 'Choo@123', 'S'),
     ('diana123', 'Diana@123', 'S'),
     ('nicolas123', 'Nicolas@123', 'S'),
     ('jay123', 'Jay@123', 'T'),
-	('sylvie123', 'Sylvie@123', 'T');
+    ('sylvie123', 'Sylvie@123', 'T');
 
 -- Create the Students table with cascading update and delete
 CREATE TABLE Students (
@@ -44,22 +55,22 @@ CREATE TABLE Teachers (
     FOREIGN KEY (UserID) REFERENCES Users(Id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
 -- Insert values into Teachers table
 INSERT INTO Teachers (TeacherName, TeacherEmail, UserID)
 VALUES 
     ('Jay', 'jay@vaniercollege.qc.ca', 5),
-	('Sylvie', 'sylvie@vaniercollege.qc.ca', 6);
+    ('Sylvie', 'sylvie@vaniercollege.qc.ca', 6);
 
+-- Create the Courses table
 CREATE TABLE Courses (
     CourseID INT PRIMARY KEY IDENTITY(1,1),
     CourseName NVARCHAR(50) NOT NULL,
     CourseBlock NVARCHAR(10) NOT NULL,
-	TeacherID INT,
-	FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID) ON DELETE CASCADE ON UPDATE CASCADE
+    TeacherID INT,
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
+-- Insert values into Courses table
 INSERT INTO Courses (CourseName, CourseBlock)
 VALUES 
     ('App Development 1', '4'),
@@ -74,10 +85,10 @@ CREATE TABLE StudentCourses (
     FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
 );
 
-Insert into StudentCourses (StudentID, CourseID)
+-- Insert values into StudentCourses table
+INSERT INTO StudentCourses (StudentID, CourseID)
 VALUES
-	('1', '1'),
-	('1', '2'),
-	('2', '1'),
-	('3', '2');
-
+    (1, 1),
+    (1, 2),
+    (2, 1),
+    (3, 2);
