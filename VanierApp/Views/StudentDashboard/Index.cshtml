@@ -1,13 +1,104 @@
-﻿@model List<CourseViewModel>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        /* Dashboard container to hold the content */
+        .dashboard-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to Student Dashboard</h1>
-    <h2>Courses Enrolled </h2>
-    @foreach (var course in Model)
-    {
-        <a class="btn btn-primary btn-sm" href="">
-            @course.CourseName
-            @course.CourseBlock
-        </a>
-    }
-</div>
+            /* Welcome header styling */
+            .dashboard-container h1 {
+                font-size: 36px;
+                color: #333;
+                margin-bottom: 10px;
+            }
+
+            .dashboard-container h2 {
+                font-size: 28px;
+                color: #555;
+                margin-bottom: 30px;
+            }
+
+        /* Courses block layout - flexbox for responsive behavior */
+        .course-blocks {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Individual course block styling */
+        .course-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 250px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+            /* On hover, make the course card pop */
+            .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            }
+
+        /* Course title */
+        .course-title {
+            font-size: 20px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        /* Course block content */
+        .course-content {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* Button style inside course block */
+        .course-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            /* Button hover effect */
+            .course-btn:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1 class="text-center">Welcome to Student Dashboard</h1>
+        <h2 class="text-center">Courses Enrolled</h2>
+
+        <!-- Course blocks container -->
+        <div class="course-blocks">
+            @foreach (var course in Model)
+            {
+                <div class="course-card">
+                    <div class="course-title">@course.CourseName</div>
+                    <div class="course-content">Course Block : @course.CourseBlock</div>
+                    <a class="course-btn" href="#">View Details</a>
+                </div>
+            }
+        </div>
+    </div>
+
+</body>
+</html>

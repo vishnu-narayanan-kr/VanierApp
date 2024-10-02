@@ -1,19 +1,105 @@
-﻿@model LoginViewModel
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        .LoginContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/Images/VanierCollegeImage.jpg'); /* Image path relative to wwwroot */
+            background-size: cover; /* Ensures the image covers the whole container */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Prevent image from repeating */
+            height: 80vh; /* Full viewport height */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden; /* Prevents any scroll bar */
+        }
 
-<div class="container">
-<h2> Login </h2>
-      <form asp-action="LoginMethod"  method="post">
-          <label>Username</label>
-          <input name="Username" />
-          <label>Password</label>
-          <input name="Password" type="password" />
-          <button>Login</button>
-      </form>
+        .LoginBox {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px; /* Limit the width */
+            text-align: center;
+            box-sizing: border-box;
+        }
 
-    @if (Model != null && !string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <div style="color:red">
-            @Model.ErrorMessage
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        .error-message {
+            color: red;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="LoginContainer">
+        <div class="LoginBox">
+            <h2>Login</h2>
+            <form asp-action="LoginMethod" method="post">
+                <label for="username">Username</label>
+                <input id="username" name="Username" type="text" placeholder="Enter your username" required />
+
+                <label for="password">Password</label>
+                <input id="password" name="Password" type="password" placeholder="Enter your password" required />
+
+                <button type="submit">Login</button>
+            </form>
+
+            @if (Model != null && !string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="error-message">
+                    @Model.ErrorMessage
+                </div>
+            }
         </div>
-    } 
-</div>
+    </div>
+
+</body>
+</html>
