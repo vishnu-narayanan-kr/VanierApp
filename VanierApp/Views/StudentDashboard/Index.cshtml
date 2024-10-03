@@ -94,7 +94,7 @@
                 <div class="course-card">
                     <div class="course-title">@course.CourseName</div>
                     <div class="course-content">Course Block : @course.CourseBlock</div>
-                    <a class="course-btn" href="#">View Details</a>
+                    <a class="course-btn" href="@Url.Action("CourseDetails", "StudentDashboard", new { courseID = course.CourseID })">View Details</a>
                 </div>
             }
         </div>

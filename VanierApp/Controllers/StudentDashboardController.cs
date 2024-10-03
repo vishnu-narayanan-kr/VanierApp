@@ -53,7 +53,7 @@ namespace VanierApp.Controllers
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "select Courses.CourseName , Courses.CourseBlock from Courses JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID where StudentCourses.StudentID = '"+ StudentID + "';";
+                string sql = "select Courses.CourseName , Courses.CourseBlock, Courses.CourseID from Courses JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID where StudentCourses.StudentID = '"+ StudentID + "';";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                             
@@ -64,10 +64,12 @@ namespace VanierApp.Controllers
                         {
                             string CourseName = reader["CourseName"].ToString();
                             string CourseBlock = reader["CourseBlock"].ToString();
+                            string CourseID = reader["CourseID"].ToString();
 
                             CourseViewModel course = new CourseViewModel();
                                 course.CourseName = CourseName;
                                 course.CourseBlock = CourseBlock;
+                                course.CourseID = CourseID; 
                             model.Add(course);
                         }
 
