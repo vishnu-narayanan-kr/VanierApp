@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Reflection;
 using VanierApp.Models;
@@ -78,6 +79,54 @@ namespace VanierApp.Controllers
             }
 
             return View(model);
+        }
+
+        public IActionResult CourseDetails(string CourseID)
+        {
+            string courseID = CourseID;
+            string StudentID = GetStudentIDFromUSername();
+            StudentGradeViewModel grade = new StudentGradeViewModel();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "Select Grades.GradeCode, Grades.GradeComments from Grades where StudentID = '"+ StudentID +"' and CourseID = '"+CourseID + "';";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+
+                   
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        
+                        while (reader.Read())
+                        {
+                            string GradeCode = reader["GradeCode"].ToString();
+                            string GradeComments = reader["GradeComments"].ToString();
+                            //string CourseID = reader["CourseID"].ToString();
+
+
+                           
+                            grade.GradeCode = GradeCode;
+                            grade.GradeComments = GradeComments;
+
+                            if (string.IsNullOrEmpty(GradeCode))
+                            {
+                                grade.GradeCode = "Grade Yet to be Posted";
+                                
+                            }
+                            if (string.IsNullOrEmpty(GradeComments))
+                            {
+                                grade.GradeComments = "comments not available";
+
+                            }                         
+                            return View(grade);
+                        }
+         
+                    }
+                    grade.GradeCode = "Grade Yet to be Posted";
+                    grade.GradeComments = "comments not available";
+                }
+            }
+            return View(grade); 
         }
     }
 }
