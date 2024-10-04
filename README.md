@@ -92,3 +92,24 @@ VALUES
     (1, 2),
     (2, 1),
     (3, 2);
+
+```
+
+## New Queries to be added after Thursday's class ( 3 Oct 2024)
+
+```sql
+update Courses Set TeacherID = '1';
+
+Create Table Grades (
+	GradeID INT PRIMARY KEY IDENTITY(1,1),
+	GradeCode NVARCHAR(2),
+	GradeComments NVARCHAR (100),
+	StudentID INT,
+    CourseID INT,
+	FOREIGN KEY (StudentID, CourseID) REFERENCES StudentCourses(StudentID, CourseID)
+)
+
+Insert into Grades (GradeCode, GradeComments, StudentID, CourseID) 
+VALUES ('A', 'Excellent', 1, 1),
+		('B', 'Good', 1, 2);
+```
