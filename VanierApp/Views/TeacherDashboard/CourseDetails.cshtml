@@ -1,7 +1,7 @@
 ﻿@model List<TeacherGradeViewModel>
 
 <div class="container">
-    <h2>Students Enrolled in Course, @ViewBag</h2>
+    <h2>Students Enrolled in Course ID: @ViewBag.CourseID</h2>
 
     <form asp-action="SaveGrades" method="post">
         <!-- Hidden input to pass the CourseID -->
