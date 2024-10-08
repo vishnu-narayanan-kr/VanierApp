@@ -94,7 +94,7 @@
                 <div class="course-card">
                     <div class="course-title">@course.CourseName</div>
                     <div class="course-content">Course Block : @course.CourseBlock</div>
-                    <a class="course-btn" href="#">Enter Grades</a>
+                    <a class="course-btn" href="@Url.Action("CourseDetails", "TeacherDashboard", new { courseID = course.CourseID })">Enter Grades</a>
                 </div>
             }
         </div>
