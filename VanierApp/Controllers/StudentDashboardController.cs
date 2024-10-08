@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Globalization;
-using System.Reflection;
 using VanierApp.Models;
 
 namespace VanierApp.Controllers
@@ -15,6 +11,35 @@ namespace VanierApp.Controllers
         {
             // Fetch the connection string from appsettings.json
             connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        }
+
+        public string GetStudentName()
+        {
+            string StudentID = GetStudentIDFromUSername();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "Select * FROM Students JOIN Users ON Users.Id = Students.UserID WHERE Students.StudentID= '" + StudentID + "'; ";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string studentName = reader["StudentName"].ToString();
+
+                            if (!string.IsNullOrEmpty(studentName))
+                            {
+                                return studentName;
+                            }
+                        }
+                        return "";
+                    }
+
+                }
+            }
 
         }
 
@@ -47,17 +72,20 @@ namespace VanierApp.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
+
+
             string StudentID = GetStudentIDFromUSername();
+            string studentName = GetStudentName();
+            HttpContext.Session.SetString("StudentName", studentName);
 
             model = new List<CourseViewModel>();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "select Courses.CourseName , Courses.CourseBlock, Courses.CourseID from Courses JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID where StudentCourses.StudentID = '"+ StudentID + "';";
+                string sql = "select Courses.CourseName , Courses.CourseBlock, Courses.CourseID from Courses JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID where StudentCourses.StudentID = '" + StudentID + "';";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                            
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -68,9 +96,9 @@ namespace VanierApp.Controllers
                             string CourseID = reader["CourseID"].ToString();
 
                             CourseViewModel course = new CourseViewModel();
-                                course.CourseName = CourseName;
-                                course.CourseBlock = CourseBlock;
-                                course.CourseID = CourseID; 
+                            course.CourseName = CourseName;
+                            course.CourseBlock = CourseBlock;
+                            course.CourseID = CourseID;
                             model.Add(course);
                         }
 
@@ -89,14 +117,13 @@ namespace VanierApp.Controllers
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "Select Grades.GradeCode, Grades.GradeComments from Grades where StudentID = '"+ StudentID +"' and CourseID = '"+CourseID + "';";
+                string sql = "Select Grades.GradeCode, Grades.GradeComments from Grades where StudentID = '" + StudentID + "' and CourseID = '" + CourseID + "';";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
 
-                   
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        
+
                         while (reader.Read())
                         {
                             string GradeCode = reader["GradeCode"].ToString();
@@ -104,30 +131,30 @@ namespace VanierApp.Controllers
                             //string CourseID = reader["CourseID"].ToString();
 
 
-                           
+
                             grade.GradeCode = GradeCode;
                             grade.GradeComments = GradeComments;
 
                             if (string.IsNullOrEmpty(GradeCode))
                             {
                                 grade.GradeCode = "Grade Yet to be Posted";
-                                
+
                             }
                             if (string.IsNullOrEmpty(GradeComments))
                             {
                                 grade.GradeComments = "comments not available";
 
-                            }                         
+                            }
                             return View(grade);
                         }
-         
+
                     }
                     grade.GradeCode = "Grade Yet to be Posted";
                     grade.GradeComments = "comments not available";
                 }
             }
-            return View(grade); 
+            return View(grade);
         }
     }
 }
- 
+
