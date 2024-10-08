@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.Diagnostics;
-using System.Reflection;
 using VanierApp.Models;
 
 namespace VanierApp.Controllers
@@ -23,6 +21,10 @@ namespace VanierApp.Controllers
             }
 
             string teacherID = GetTeacherIDFromUSername();
+            string teacherName = GetTeacherName();
+            HttpContext.Session.SetString("TeacherName", teacherName);
+
+
 
             model = new List<CourseViewModel>();
 
@@ -73,6 +75,48 @@ namespace VanierApp.Controllers
                 }
             }
         }
+
+        public string GetTeacherName()
+        {
+
+            string TeacherID = GetTeacherIDFromUSername();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "Select * FROM Teachers JOIN Users ON Users.Id = Teachers.UserID WHERE Teachers.TeacherID= '" + TeacherID + "'; ";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+
+                        while (reader.Read())
+                        {
+                            string teacherName = reader["TeacherName"].ToString();
+                            //string studentEmail = reader["StudentEmail"].ToString();
+
+                            //model.StudentName = studentName;
+                            //model.StudentEmail = studentEmail;
+
+                            if (!string.IsNullOrEmpty(teacherName))
+                            {
+                                //HttpContext.Session.SetString("StudentName", studentName);
+                                //ViewBag.StudentName = studentName;
+                                return teacherName;
+                            }
+
+
+                        }
+                        return "";
+
+                    }
+
+                }
+            }
+
+        }
+
     }
 
 
