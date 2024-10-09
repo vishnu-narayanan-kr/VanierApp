@@ -1,0 +1,4 @@
+date: 2024-10-08 20:27:23, userName: choo123, result: Successful login
+date: 2024-10-08 20:27:40, userName: jay123, result: Successful login
+date: 2024-10-08 20:27:57, userName: nicolas123, result: Unsuccessful login
+date: 2024-10-08 20:28:27, userName: sleazyHacker, result: Unsuccessful login
