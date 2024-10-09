@@ -10,7 +10,16 @@ namespace VanierApp.Controllers
 {
     public class LoginController : Controller
     {
-
+        private void UpdateLogRegistry(string msg) 
+        {
+            string logEntry = "date: " + DateTime.Now + ", " + msg;
+            string dir = Directory.GetCurrentDirectory();
+            string path = Path.Combine(dir, "Output\\Log.txt");
+            using (StreamWriter sw = new StreamWriter(path, true))
+            {
+                sw.WriteLine(logEntry);
+            }
+        }
         public readonly string connectionString;
         public LoginController(IConfiguration configuration)
         {
@@ -49,6 +58,8 @@ namespace VanierApp.Controllers
                     {
                         if (reader.Read())
                         {
+                            UpdateLogRegistry("userName: " + model.Username +
+                                ", result: Successful login");
                             string userRole = reader["UserRole"].ToString();
 
                             HttpContext.Session.SetString("Username", model.Username);
@@ -65,6 +76,8 @@ namespace VanierApp.Controllers
                         }
                         else
                         {
+                            UpdateLogRegistry("userName: " + model.Username +
+                                ", result: Unsuccessful login");
                             model.ErrorMessage = "Your username/password is incorrect";
                             return View("Index", model);
                         }
