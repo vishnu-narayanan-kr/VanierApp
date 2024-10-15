@@ -84,7 +84,7 @@
 <body>
 
     <div class="dashboard-container">
-        <h1 class="text-center">Welcome to Teachers Dashboard</h1>
+        <h1 class="text-center">Welcome, @Context.Session.GetString("TeacherName")</h1>
         <h2 class="text-center">Courses Teaching</h2>
 
         <!-- Course blocks container -->
@@ -94,7 +94,7 @@
                 <div class="course-card">
                     <div class="course-title">@course.CourseName</div>
                     <div class="course-content">Course Block : @course.CourseBlock</div>
-                    <a class="course-btn" href="#">Enter Grades</a>
+                    <a class="course-btn" href="@Url.Action("CourseDetails", "TeacherDashboard", new { courseID = course.CourseID })">Enter Grades</a>
                 </div>
             }
         </div>
