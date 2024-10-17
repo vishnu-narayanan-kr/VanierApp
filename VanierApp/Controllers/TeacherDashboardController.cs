@@ -273,7 +273,7 @@ namespace VanierApp.Controllers
             StudentDAO grades = new StudentDAO(connectionString);
             List<TeacherGradeViewModel> StudentList = grades.GetTeacherGrade(CourseID);
             StringBuilder csv = new StringBuilder();
-            csv.AppendLine("Course_Name,Student_ID,Student_Name,Grade_Code,GradeC_omments");
+            csv.AppendLine("Course_Name,Student_ID,Student_Name,Grade_Code,Grade_Comments");
             foreach (var student in StudentList)
             {
                 csv.AppendLine(
