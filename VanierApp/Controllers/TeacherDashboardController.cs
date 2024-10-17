@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text;
+using VanierApp.Data;
 using VanierApp.Models;
 
 namespace VanierApp.Controllers
@@ -10,12 +12,14 @@ namespace VanierApp.Controllers
     public class TeacherDashboardController : Controller
     {
         public readonly string connectionString;
+
+
         public TeacherDashboardController(IConfiguration configuration)
         {
             // Fetch the connection string from appsettings.json
             connectionString = configuration.GetConnectionString("DefaultConnection");
-
         }
+
         public IActionResult Index(List<CourseViewModel> model)
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("Username")))
@@ -28,13 +32,14 @@ namespace VanierApp.Controllers
             HttpContext.Session.SetString("TeacherName", teacherName);
 
 
-
             model = new List<CourseViewModel>();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "select Courses.CourseName , Courses.CourseBlock, Courses.CourseID from Courses where TeacherID = '" + teacherID + "';";
+                string sql =
+                    "select Courses.CourseName , Courses.CourseBlock, Courses.CourseID from Courses where TeacherID = '" +
+                    teacherID + "';";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
@@ -52,10 +57,10 @@ namespace VanierApp.Controllers
                             course.CourseID = CourseID;
                             model.Add(course);
                         }
-
                     }
                 }
             }
+
             return View(model);
         }
 
@@ -71,7 +76,7 @@ namespace VanierApp.Controllers
             try
             {
                 string teacherID = GetTeacherIDFromUSername();
-                
+
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -97,8 +102,12 @@ namespace VanierApp.Controllers
                                 {
                                     StudentID = reader["StudentID"].ToString(),
                                     StudentName = reader["StudentName"].ToString(),
-                                    GradeCode = reader["GradeCode"] != DBNull.Value ? reader["GradeCode"].ToString() : "",  // Load saved GradeCode
-                                    GradeComments = reader["GradeComments"] != DBNull.Value ? reader["GradeComments"].ToString() : ""  // Load saved comments
+                                    GradeCode = reader["GradeCode"] != DBNull.Value
+                                        ? reader["GradeCode"].ToString()
+                                        : "", // Load saved GradeCode
+                                    GradeComments = reader["GradeComments"] != DBNull.Value
+                                        ? reader["GradeComments"].ToString()
+                                        : "" // Load saved comments
                                 };
 
                                 StudentList.Add(studentGrade);
@@ -111,7 +120,8 @@ namespace VanierApp.Controllers
             {
                 Console.WriteLine(ex.ToString());
             }
-            ViewBag.CourseID = courseID;  // Pass the CourseID to the view
+
+            ViewBag.CourseID = courseID; // Pass the CourseID to the view
             return View(StudentList);
         }
 
@@ -127,7 +137,8 @@ namespace VanierApp.Controllers
                     foreach (var student in StudentList)
                     {
                         // Check if the grade already exists for the student
-                        string checkQuery = "SELECT COUNT(*) FROM Grades WHERE StudentID = @StudentID AND CourseID = @CourseID";
+                        string checkQuery =
+                            "SELECT COUNT(*) FROM Grades WHERE StudentID = @StudentID AND CourseID = @CourseID";
                         using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection))
                         {
                             checkCommand.Parameters.AddWithValue("@StudentID", student.StudentID);
@@ -138,11 +149,14 @@ namespace VanierApp.Controllers
                             if (gradeExists > 0)
                             {
                                 // Update the existing grade
-                                string updateQuery = "UPDATE Grades SET GradeCode = @GradeCode, GradeComments = @GradeComments WHERE StudentID = @StudentID AND CourseID = @CourseID";
+                                string updateQuery =
+                                    "UPDATE Grades SET GradeCode = @GradeCode, GradeComments = @GradeComments WHERE StudentID = @StudentID AND CourseID = @CourseID";
                                 using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                                 {
-                                    updateCommand.Parameters.AddWithValue("@GradeCode", student.GradeCode ?? (object)DBNull.Value);
-                                    updateCommand.Parameters.AddWithValue("@GradeComments", student.GradeComments ?? (object)DBNull.Value);
+                                    updateCommand.Parameters.AddWithValue("@GradeCode",
+                                        student.GradeCode ?? (object)DBNull.Value);
+                                    updateCommand.Parameters.AddWithValue("@GradeComments",
+                                        student.GradeComments ?? (object)DBNull.Value);
                                     updateCommand.Parameters.AddWithValue("@StudentID", student.StudentID);
                                     updateCommand.Parameters.AddWithValue("@CourseID", CourseID);
 
@@ -152,13 +166,16 @@ namespace VanierApp.Controllers
                             else
                             {
                                 // Insert new grade if it doesn't exist
-                                string insertQuery = "INSERT INTO Grades (StudentID, CourseID, GradeCode, GradeComments) VALUES (@StudentID, @CourseID, @GradeCode, @GradeComments)";
+                                string insertQuery =
+                                    "INSERT INTO Grades (StudentID, CourseID, GradeCode, GradeComments) VALUES (@StudentID, @CourseID, @GradeCode, @GradeComments)";
                                 using (SqlCommand insertCommand = new SqlCommand(insertQuery, connection))
                                 {
                                     insertCommand.Parameters.AddWithValue("@StudentID", student.StudentID);
                                     insertCommand.Parameters.AddWithValue("@CourseID", CourseID);
-                                    insertCommand.Parameters.AddWithValue("@GradeCode", student.GradeCode ?? (object)DBNull.Value);
-                                    insertCommand.Parameters.AddWithValue("@GradeComments", student.GradeComments ?? (object)DBNull.Value);
+                                    insertCommand.Parameters.AddWithValue("@GradeCode",
+                                        student.GradeCode ?? (object)DBNull.Value);
+                                    insertCommand.Parameters.AddWithValue("@GradeComments",
+                                        student.GradeComments ?? (object)DBNull.Value);
 
                                     insertCommand.ExecuteNonQuery();
                                 }
@@ -169,14 +186,14 @@ namespace VanierApp.Controllers
 
                 // Set success message
                 TempData["Message"] = "Grades saved successfully!";
-                TempData["MessageType"] = "success";  // Bootstrap alert type for success
+                TempData["MessageType"] = "success"; // Bootstrap alert type for success
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 // Set error message
                 TempData["Message"] = "There was an error saving the grades.";
-                TempData["MessageType"] = "danger";  // Bootstrap alert type for errors
+                TempData["MessageType"] = "danger"; // Bootstrap alert type for errors
             }
 
             //return View(StudentList);
@@ -191,7 +208,9 @@ namespace VanierApp.Controllers
             {
                 connection.Open();
                 string userName = HttpContext.Session.GetString("Username");
-                string sql = "SELECT Teachers.TeacherID from Users JOIN Teachers ON Users.Id = Teachers.UserID where Users.Username ='" + userName + "';";
+                string sql =
+                    "SELECT Teachers.TeacherID from Users JOIN Teachers ON Users.Id = Teachers.UserID where Users.Username ='" +
+                    userName + "';";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -202,6 +221,7 @@ namespace VanierApp.Controllers
                             return teacherID;
                         }
                     }
+
                     return "";
                 }
             }
@@ -209,19 +229,17 @@ namespace VanierApp.Controllers
 
         public string GetTeacherName()
         {
-
             string TeacherID = GetTeacherIDFromUSername();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "Select * FROM Teachers JOIN Users ON Users.Id = Teachers.UserID WHERE Teachers.TeacherID= '" + TeacherID + "'; ";
+                string sql =
+                    "Select * FROM Teachers JOIN Users ON Users.Id = Teachers.UserID WHERE Teachers.TeacherID= '" +
+                    TeacherID + "'; ";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-
-
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-
                         while (reader.Read())
                         {
                             string teacherName = reader["TeacherName"].ToString();
@@ -236,19 +254,38 @@ namespace VanierApp.Controllers
                                 //ViewBag.StudentName = studentName;
                                 return teacherName;
                             }
-
-
                         }
+
                         return "";
-
                     }
-
                 }
             }
-
         }
 
+
+        public IActionResult DownloadGrades(String CourseID)
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Username")))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            StudentDAO grades = new StudentDAO(connectionString);
+            List<TeacherGradeViewModel> StudentList = grades.GetTeacherGrade(CourseID);
+            StringBuilder csv = new StringBuilder();
+            csv.AppendLine("Course_Name,Student_ID,Student_Name,Grade_Code,GradeC_omments");
+            foreach (var student in StudentList)
+            {
+                csv.AppendLine(
+                    $"\"{student.CourseName}\",{student.StudentID},\"{student.StudentName}\", {student.GradeCode}, \"{student
+                        .GradeComments}\"");
+            }
+
+            String date = DateTime.Now.ToString("yyyyMMddHHmm");
+            String courseName = StudentList.First().CourseName;
+
+            return File(Encoding.UTF8.GetBytes(csv.ToString()), "text/csv"
+                , $@"Grades {courseName} {date}.csv");
+        }
     }
-
-
 }

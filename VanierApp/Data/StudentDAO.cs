@@ -9,6 +9,7 @@ namespace VanierApp.Data
     public class StudentDAO
     {
         private readonly string _connectionString;
+
         public StudentDAO(string connectionString)
         {
             _connectionString = connectionString;
@@ -32,6 +33,7 @@ namespace VanierApp.Data
                     }
                 }
             }
+
             return string.Empty;
         }
 
@@ -40,7 +42,8 @@ namespace VanierApp.Data
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
-                string sql = "SELECT Students.StudentID FROM Users JOIN Students ON Users.Id = Students.UserID WHERE Users.Username = @UserName;";
+                string sql =
+                    "SELECT Students.StudentID FROM Users JOIN Students ON Users.Id = Students.UserID WHERE Users.Username = @UserName;";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@UserName", userName);
@@ -53,6 +56,7 @@ namespace VanierApp.Data
                     }
                 }
             }
+
             return string.Empty;
         }
 
@@ -83,6 +87,7 @@ namespace VanierApp.Data
                     }
                 }
             }
+
             return courses;
         }
 
@@ -92,7 +97,8 @@ namespace VanierApp.Data
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
-                string sql = "SELECT Grades.GradeCode, Grades.GradeComments FROM Grades WHERE StudentID = @StudentID AND CourseID = @CourseID;";
+                string sql =
+                    "SELECT Grades.GradeCode, Grades.GradeComments FROM Grades WHERE StudentID = @StudentID AND CourseID = @CourseID;";
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@StudentID", studentID);
@@ -107,9 +113,50 @@ namespace VanierApp.Data
                     }
                 }
             }
+
             grade.GradeCode ??= "Grade Yet to be Posted";
             grade.GradeComments ??= "Comments not available";
             return grade;
+        }
+
+        public List<TeacherGradeViewModel> GetTeacherGrade(string courseID)
+        {
+            List<TeacherGradeViewModel> StudentList = new List<TeacherGradeViewModel>();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string sql =
+                    @"
+                    SELECT Students.StudentID, Students.StudentName, Grades.GradeCode, Grades.GradeComments, CourseName
+                    FROM StudentCourses
+                    JOIN Students ON StudentCourses.StudentID = Students.StudentID
+                    JOIN dbo.Courses C on C.CourseID = StudentCourses.CourseID
+                    LEFT JOIN Grades ON Grades.StudentID = StudentCourses.StudentID AND Grades.CourseID = StudentCourses.CourseID
+                    WHERE StudentCourses.CourseID = @courseID;";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@CourseID", courseID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            TeacherGradeViewModel studentGrade = new TeacherGradeViewModel()
+                            {
+                                CourseName = reader["CourseName"].ToString(),
+                                StudentID = reader["StudentID"].ToString(),
+                                StudentName = reader["StudentName"].ToString(),
+                                GradeCode = reader["GradeCode"] != DBNull.Value ? reader["GradeCode"].ToString() : "",
+                                GradeComments = reader["GradeComments"] != DBNull.Value
+                                    ? reader["GradeComments"].ToString()
+                                    : "",
+                            };
+                            StudentList.Add(studentGrade);
+                        }
+                    }
+                }
+            }
+            return StudentList;
         }
     }
 }

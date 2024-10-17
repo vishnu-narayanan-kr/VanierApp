@@ -5,44 +5,50 @@
 
     <form asp-action="SaveGrades" method="post">
         <!-- Hidden input to pass the CourseID -->
-        <input type="hidden" name="CourseID" value="@ViewBag.CourseID" />
+        <input type="hidden" name="CourseID" value="@ViewBag.CourseID"/>
 
         <table class="table table-bordered">
             <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Student Name</th>
-                    <th>Grade</th>
-                    <th>Comments</th>
-                </tr>
+            <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Grade</th>
+                <th>Comments</th>
+            </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < Model.Count; i++)
-                {
-                    <tr>
-                        <td>@Model[i].StudentID</td>
-                        <td>@Model[i].StudentName</td>
-                        <td>
-                            <input type="hidden" name="StudentList[@i].StudentID" value="@Model[i].StudentID" />
-                            <input type="text" name="StudentList[@i].GradeCode" value="@Model[i].GradeCode" class="form-control" />
-                        </td>
-                        <td>
-                            <input type="text" name="StudentList[@i].GradeComments" value="@Model[i].GradeComments" class="form-control" />
-                        </td>
-                    </tr>
-                }
+            @for (int i = 0; i < Model.Count; i++)
+            {
+            <tr>
+                <td>@Model[i].StudentID</td>
+                <td>@Model[i].StudentName</td>
+                <td>
+                    <input type="hidden" name="StudentList[@i].StudentID" value="@Model[i].StudentID"/>
+                    <input type="text" name="StudentList[@i].GradeCode" value="@Model[i].GradeCode"
+                           class="form-control"/>
+                </td>
+                <td>
+                    <input type="text" name="StudentList[@i].GradeComments" value="@Model[i].GradeComments"
+                           class="form-control"/>
+                </td>
+            </tr>
+            }
             </tbody>
         </table>
 
-        <button type="submit" class="btn btn-success">Save Grades</button>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Save Grades</button>
+            <a class="btn btn-primary" href="@Url.Action("DownloadGrades","TeacherDashboard",new{CourseID = ViewBag.CourseID})">Download Grades</a>
+        </div>
 
         <!-- Display success or error message -->
         @if (TempData["Message"] != null)
         {
-            var messageType = TempData["MessageType"] ?? "info"; 
-            <div class="alert alert-@messageType">
-                @TempData["Message"]
-            </div>
+        var messageType = TempData["MessageType"] ?? "info";
+        <div class="my-2 alert alert-@messageType">
+            @TempData["Message"]
+        </div>
         }
 
     </form>
