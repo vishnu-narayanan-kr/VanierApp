@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /VanierApp/appsettings.json
-/VanierApp/appsettings.json
-/VanierApp/appsettings.json
+/VanierApp/appsettings.Development.json
+
