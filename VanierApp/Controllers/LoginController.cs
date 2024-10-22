@@ -112,6 +112,8 @@ namespace VanierApp.Controllers
 
                 if (user.UserRole == "S")
                     return RedirectToAction("Index", "StudentDashboard");
+                if (user.UserRole == "A") 
+                    return RedirectToAction("Index", "AdminDashboard");
                 else
                     return RedirectToAction("Index", "TeacherDashboard");
             }

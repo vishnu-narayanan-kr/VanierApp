@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+       
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Dashboard Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="alert alert-info">
+                            <h4>Total Students</h4>
+                            <p>@Model.TotalStudents</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="alert alert-success">
+                            <h4>Total Teachers</h4>
+                            <p>@Model.TotalTeachers</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="alert alert-warning">
+                            <h4>Total Courses</h4>
+                            <p>@Model.TotalCourses</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="alert alert-danger">
+                            <h4>Total Enrollments</h4>
+                            <p>@Model.TotalEnrollments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">User Management</h5>
+            </div>
+            <div class="card-body">
+                <h6>Create/Manage Student Accounts</h6>
+                <a href="@Url.Action("CreateStudent", "AdminDashboard")" class="btn btn-primary mb-2">Add New Student</a>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Students)
+                        {
+                            <tr>
+                                <td>@student.StudentName</td>
+                                <td>@student.StudentEmail</td>
+                                <td>
+                                    <a href="@Url.Action("EditStudent", "AdminDashboard", new { id = student.StudentID })" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="@Url.Action("DeleteStudent", "AdminDashboard", new { id = student.StudentID })" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <h6>Create/Manage Teacher Accounts</h6>
+                <a href="@Url.Action("CreateTeacher", "AdminDashboard")" class="btn btn-primary mb-2">Add New Teacher</a>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var teacher in Model.Teachers)
+                        {
+                            <tr>
+                                <td>@teacher.TeacherName</td>
+                                <td>@teacher.TeacherEmail</td>
+                                <td>
+                                    <a href="@Url.Action("EditTeacher", "AdminDashboard", new { id = teacher.TeacherID })" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="@Url.Action("DeleteTeacher", "AdminDashboard", new { id = teacher.TeacherID })" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Course Management</h5>
+            </div>
+            <div class="card-body">
+                <h6>Create/Edit Courses</h6>
+                <a href="@Url.Action("CreateCourse", "AdminDashboard")" class="btn btn-primary mb-2">Add New Course</a>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Teacher</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var course in Model.Courses)
+                        {
+                            <tr>
+                                <td>@course.CourseName</td>
+                                <td>@course.TeacherName</td>
+                                <td>
+                                    <a href="@Url.Action("EditCourse", "AdminDashboard", new { id = 1 })" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="@Url.Action("DeleteCourse", "AdminDashboard", new { id = 1 })" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <h6>Enroll Students in Courses</h6>
+                <form method="post" action="@Url.Action("EnrollStudents", "AdminDashboard")">
+                    <div class="form-group">
+                        <label for="courseSelect">Select Course:</label>
+                        <select id="courseSelect" class="form-control" name="courseId">
+                            @foreach(var course in Model.Courses)
+                            {
+                                <option value=>@course.CourseName</option>
+                            }
+                        </select>
+                    </div>
+                    <h6>Select Students:</h6>
+                    <div>
+                        <select id="courseSelect" class="form-control" name="studentId">
+                            @foreach (var student in Model.Students)
+                            {
+                                <option value=>@student.StudentName</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success mt-2">Enroll Students</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</html>
