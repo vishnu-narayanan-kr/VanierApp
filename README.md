@@ -1,13 +1,15 @@
 # VanierApp
 
 ## Project Overview
-VanierApp is a web application designed to manage students, teachers, and courses at Vanier College. This app allows users to interact with course content, track enrollment, and manage user roles such as students, teachers, and administrators.
+
+VanierApp is a web application designed to manage students, teachers, and courses at Vanier College. This app allows users to interact with course content, track enrollment, and manage user roles such as students, teachers, and administrators. **Recent enhancements include optimized database queries and user interface improvements.**
 
 ## Database Setup
 To set up the VanierApp database, follow these steps:
 
-1. **Create a new Database**: 
-   Ensure that you have a new database created in your SQL Server instance to store the tables for this application.
+1. **Create a new Database**:
+   Ensure you have a SQL Server instance running. Use SQL Server Management Studio to create a new database named `VanierApp`.
+
 
 2. **Run the following script** to create and populate the necessary tables:
 
@@ -22,7 +24,7 @@ CREATE TABLE Users (
 
 -- Insert values into Users table
 INSERT INTO Users (Username, Password, UserRole)
-VALUES 
+VALUES
     ('admin123', 'Admin@123', 'A'),
     ('choo123', 'Choo@123', 'S'),
     ('daiana123', 'Daiana@123', 'S'),
@@ -41,14 +43,14 @@ CREATE TABLE Students (
 
 -- Insert values into Students table
 INSERT INTO Students (StudentName, StudentEmail, UserID)
-VALUES 
+VALUES
     ('Choo', 'choo@vaniercollege.qc.ca', 2),
     ('Daiana', 'daiana@vaniercollege.qc.ca', 3),
     ('Nicolas', 'nicolas@vaniercollege.qc.ca', 4);
 
 -- Create the Teachers table with cascading update and delete
 CREATE TABLE Teachers (
-    TeacherID INT PRIMARY KEY IDENTITY(1,1), 
+    TeacherID INT PRIMARY KEY IDENTITY(1,1),
     TeacherName NVARCHAR(25),
     TeacherEmail NVARCHAR(30),
     UserID INT,
@@ -57,7 +59,7 @@ CREATE TABLE Teachers (
 
 -- Insert values into Teachers table
 INSERT INTO Teachers (TeacherName, TeacherEmail, UserID)
-VALUES 
+VALUES
     ('Jay', 'jay@vaniercollege.qc.ca', 5),
     ('Sylvie', 'sylvie@vaniercollege.qc.ca', 6);
 
@@ -72,7 +74,7 @@ CREATE TABLE Courses (
 
 -- Insert values into Courses table
 INSERT INTO Courses (CourseName, CourseBlock)
-VALUES 
+VALUES
     ('App Development 1', '4'),
     ('System Development', '4');
 
@@ -109,7 +111,15 @@ Create Table Grades (
 	FOREIGN KEY (StudentID, CourseID) REFERENCES StudentCourses(StudentID, CourseID)
 )
 
-Insert into Grades (GradeCode, GradeComments, StudentID, CourseID) 
+Insert into Grades (GradeCode, GradeComments, StudentID, CourseID)
 VALUES ('A', 'Excellent', 1, 1),
 		('B', 'Good', 1, 2);
 ```
+
+## Contributors
+- Choo: Added welcome messages for student and teacher dashboards.
+- Daiana: Improved UI components for better user experience.
+- Nicolas: Implemented login tracking features.
+- Jay: Created an error handling page.
+- Sylvie: Added export functionality for student data.
+- Mohamad: reviwed and adjust the file
