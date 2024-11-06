@@ -597,7 +597,7 @@
 
                 if (response.ok) {
                     alert('Student enrolled successfully.');
-                    location.reload(); // Refresh to see the updated enrollments
+                    location.reload();
                 } else {
                     const errorData = await response.json();
                     alert(`Error: ${errorData.errors.Enrollment || 'Unable to enroll student.'}`);
