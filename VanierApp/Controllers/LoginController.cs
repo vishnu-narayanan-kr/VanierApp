@@ -6,6 +6,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using VanierApp.Data;
+using BCrypt.Net;
 
 namespace VanierApp.Controllers
 {
@@ -17,7 +18,7 @@ namespace VanierApp.Controllers
         {
             _context = context;
         }
-        private void UpdateLogRegistry(string msg) 
+        private void UpdateLogRegistry(string msg)
         {
             string logEntry = "date: " + DateTime.Now + ", " + msg;
             string dir = Directory.GetCurrentDirectory();
@@ -35,6 +36,7 @@ namespace VanierApp.Controllers
         //}
 
         private readonly ILogger<HomeController> _logger;
+
 
         public IActionResult Index()
         {
@@ -97,33 +99,37 @@ namespace VanierApp.Controllers
         //    //return View(model);
         //    return View("Index", model);
         //}
-
         public IActionResult LoginMethod(LoginViewModel model)
         {
-            var user = _context.Users
-                .FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
+            var user = _context.Users.FirstOrDefault(u => u.Username == model.Username);
 
             if (user != null)
             {
-                //UpdateLogRegistry("userName: " + model.Username + ", result: Successful login");
-                HttpContext.Session.SetString("Username", model.Username);
-                HttpContext.Session.SetString("UserRole", user.UserRole);
-                HttpContext.Session.SetString("IsAuthenticated", "Y");
+                bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+                if (isPasswordCorrect)
+                {
+                    // Successful login
+                    HttpContext.Session.SetString("Username", model.Username);
+                    HttpContext.Session.SetString("UserRole", user.UserRole);
+                    HttpContext.Session.SetString("IsAuthenticated", "Y");
 
-                if (user.UserRole == "S")
-                    return RedirectToAction("Index", "StudentDashboard");
-                if (user.UserRole == "A") 
-                    return RedirectToAction("Index", "AdminDashboard");
-                else
-                    return RedirectToAction("Index", "TeacherDashboard");
+                    if (user.UserRole == "S")
+                        return RedirectToAction("Index", "StudentDashboard");
+                    if (user.UserRole == "A")
+                        return RedirectToAction("Index", "AdminDashboard");
+                    else
+                        return RedirectToAction("Index", "TeacherDashboard");
+                }
             }
-            else
-            {
-                //UpdateLogRegistry("userName: " + model.Username + ", result: Unsuccessful login");
-                model.ErrorMessage = "Your username/password is incorrect";
-                return View("Index", model);
-            }
+
+            // If we reach here, login failed
+            model.ErrorMessage = "Your username/password is incorrect";
+            return View("Index", model);
         }
+
+
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
