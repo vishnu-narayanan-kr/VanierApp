@@ -6,6 +6,5 @@
         public string CourseName { get; set; }
         public string CourseBlock { get; set; }
         public int? TeacherID { get; set; }
-        public string TeacherName { get; set; }
     }
 }

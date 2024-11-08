@@ -1,17 +1,33 @@
-﻿<!DOCTYPE html>
+﻿@model VanierApp.Models.DashboardViewModel
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>@ViewData["Title"] - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-       
+        /* Custom Styles */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1, h5 {
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>@ViewData["Title"]</h1>
 
+        <!-- Dashboard Overview Section -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Dashboard Overview</h5>
@@ -46,13 +62,15 @@
             </div>
         </div>
 
+        <!-- User Management Section -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">User Management</h5>
             </div>
             <div class="card-body">
+                <!-- Students Management -->
                 <h6>Create/Manage Student Accounts</h6>
-                <a href="@Url.Action("CreateStudent", "AdminDashboard")" class="btn btn-primary mb-2">Add New Student</a>
+                <button class="btn btn-primary mb-2" onclick="showModal('createStudentModal')">Add New Student</button>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -64,20 +82,21 @@
                     <tbody>
                         @foreach (var student in Model.Students)
                         {
-                            <tr>
+                            <tr id="student-row-@student.StudentID">
                                 <td>@student.StudentName</td>
                                 <td>@student.StudentEmail</td>
                                 <td>
-                                    <a href="@Url.Action("EditStudent", "AdminDashboard", new { id = student.StudentID })" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="@Url.Action("DeleteStudent", "AdminDashboard", new { id = student.StudentID })" class="btn btn-danger btn-sm">Delete</a>
+                                    <button class="btn btn-warning btn-sm" onclick="editStudent(@student.StudentID, '@student.StudentName', '@student.StudentEmail')">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="showModal('deleteStudentModal', @student.StudentID)">Delete</button>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
 
+                <!-- Teachers Management -->
                 <h6>Create/Manage Teacher Accounts</h6>
-                <a href="@Url.Action("CreateTeacher", "AdminDashboard")" class="btn btn-primary mb-2">Add New Teacher</a>
+                <button class="btn btn-primary mb-2" onclick="showModal('createTeacherModal')">Add New Teacher</button>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -89,12 +108,12 @@
                     <tbody>
                         @foreach (var teacher in Model.Teachers)
                         {
-                            <tr>
+                            <tr id="teacher-row-@teacher.TeacherID">
                                 <td>@teacher.TeacherName</td>
                                 <td>@teacher.TeacherEmail</td>
                                 <td>
-                                    <a href="@Url.Action("EditTeacher", "AdminDashboard", new { id = teacher.TeacherID })" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="@Url.Action("DeleteTeacher", "AdminDashboard", new { id = teacher.TeacherID })" class="btn btn-danger btn-sm">Delete</a>
+                                    <button class="btn btn-warning btn-sm" onclick="editTeacher(@teacher.TeacherID, '@teacher.TeacherName', '@teacher.TeacherEmail')">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="showModal('deleteTeacherModal', @teacher.TeacherID)">Delete</button>
                                 </td>
                             </tr>
                         }
@@ -103,13 +122,15 @@
             </div>
         </div>
 
+        <!-- Course Management Section -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Course Management</h5>
             </div>
             <div class="card-body">
+                <!-- Courses Management -->
                 <h6>Create/Edit Courses</h6>
-                <a href="@Url.Action("CreateCourse", "AdminDashboard")" class="btn btn-primary mb-2">Add New Course</a>
+                <button class="btn btn-primary mb-2" onclick="showModal('createCourseModal')">Add New Course</button>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -119,46 +140,473 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(var course in Model.Courses)
+                        @foreach (var course in Model.Courses)
                         {
-                            <tr>
+                            <tr id="course-row-@course.CourseID">
                                 <td>@course.CourseName</td>
-                                <td>@course.TeacherName</td>
+                                <td>@course.TeacherID</td>
                                 <td>
-                                    <a href="@Url.Action("EditCourse", "AdminDashboard", new { id = 1 })" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="@Url.Action("DeleteCourse", "AdminDashboard", new { id = 1 })" class="btn btn-danger btn-sm">Delete</a>
+                                    <button class="btn btn-warning btn-sm" onclick="editCourse(@course.CourseID, '@course.CourseName', '@course.TeacherID')">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="showModal('deleteCourseModal', @course.CourseID)">Delete</button>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
 
+                <!-- Enroll Students in Courses -->
                 <h6>Enroll Students in Courses</h6>
-                <form method="post" action="@Url.Action("EnrollStudents", "AdminDashboard")">
+                <form method="post" action="@Url.Action("EnrollStudent", "AdminDashboard")">
                     <div class="form-group">
-                        <label for="courseSelect">Select Course:</label>
-                        <select id="courseSelect" class="form-control" name="courseId">
-                            @foreach(var course in Model.Courses)
-                            {
-                                <option value=>@course.CourseName</option>
-                            }
-                        </select>
-                    </div>
-                    <h6>Select Students:</h6>
-                    <div>
-                        <select id="courseSelect" class="form-control" name="studentId">
+                        <label for="studentId">Select Student:</label>
+                        <select id="studentId" name="studentId" class="form-control">
                             @foreach (var student in Model.Students)
                             {
-                                <option value=>@student.StudentName</option>
+                                <option value="@student.StudentID">@student.StudentName</option>
                             }
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-success mt-2">Enroll Students</button>
+                    <div class="form-group">
+                        <label for="courseId">Select Course:</label>
+                        <select id="courseId" name="courseId" class="form-control">
+                            @foreach (var course in Model.Courses)
+                            {
+                                <option value="@course.CourseID">@course.CourseName</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="enrollStudent()">Enroll</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Modals for CRUD operations -->
+    <!-- Create Student Modal -->
+    <div class="modal fade" id="createStudentModal" tabindex="-1" role="dialog" aria-labelledby="createStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createStudentModalLabel">Add New Student</h5>
+                    <button type="button" class="close" onclick="hideModal('createStudentModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="@Url.Action("CreateStudent", "AdminDashboard")">
+                        <div class="form-group">
+                            <label for="studentName">Name:</label>
+                            <input type="text" class="form-control" id="studentName" name="StudentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentEmail">Email:</label>
+                            <input type="email" class="form-control" id="studentEmail" name="StudentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentPassword">Password:</label>
+                            <input type="password" class="form-control" id="studentPassword" name="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Student Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+                    <button type="button" class="close" onclick="hideModal('editStudentModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="@Url.Action("EditStudent", "AdminDashboard")">
+                        <input type="hidden" id="editStudentId" name="StudentID">
+                        <div class="form-group">
+                            <label for="editStudentName">Name:</label>
+                            <input type="text" class="form-control" id="editStudentName" name="StudentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editStudentEmail">Email:</label>
+                            <input type="email" class="form-control" id="editStudentEmail" name="StudentEmail" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Teacher Modal -->
+    <div class="modal fade" id="createTeacherModal" tabindex="-1" role="dialog" aria-labelledby="createTeacherModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTeacherModalLabel">Add New Teacher</h5>
+                    <button type="button" class="close" onclick="hideModal('createTeacherModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="@Url.Action("CreateTeacher", "AdminDashboard")">
+                        <div class="form-group">
+                            <label for="teacherName">Name:</label>
+                            <input type="text" class="form-control" id="teacherName" name="TeacherName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacherEmail">Email:</label>
+                            <input type="email" class="form-control" id="teacherEmail" name="TeacherEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacherPassword">Password:</label>
+                            <input type="password" class="form-control" id="teacherPassword" name="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Teacher Modal -->
+    <div class="modal fade" id="editTeacherModal" tabindex="-1" role="dialog" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTeacherModalLabel">Edit Teacher</h5>
+                    <button type="button" class="close" onclick="hideModal('editTeacherModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="@Url.Action("EditTeacher", "AdminDashboard")">
+                        <input type="hidden" id="editTeacherId" name="TeacherID">
+                        <div class="form-group">
+                            <label for="editTeacherName">Name:</label>
+                            <input type="text" class="form-control" id="editTeacherName" name="TeacherName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editTeacherEmail">Email:</label>
+                            <input type="email" class="form-control" id="editTeacherEmail" name="TeacherEmail" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Student Modal -->
+    <div class="modal fade" id="deleteStudentModal" tabindex="-1" role="dialog" aria-labelledby="deleteStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteStudentModalLabel">Delete Student</h5>
+                    <button type="button" class="close" onclick="hideModal('deleteStudentModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this student?</p>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteStudent()">Delete</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('deleteStudentModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Teacher Modal -->
+    <div class="modal fade" id="deleteTeacherModal" tabindex="-1" role="dialog" aria-labelledby="deleteTeacherModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTeacherModalLabel">Delete Teacher</h5>
+                    <button type="button" class="close" onclick="hideModal('deleteTeacherModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this teacher?</p>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteTeacher()">Delete</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('deleteTeacherModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Course Modal -->
+    <div class="modal fade" id="createCourseModal" tabindex="-1" role="dialog" aria-labelledby="createCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCourseModalLabel">Add New Course</h5>
+                    <button type="button" class="close" onclick="hideModal('createCourseModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="@Url.Action("CreateCourse", "AdminDashboard")">
+                        <div class="form-group">
+                            <label for="courseName">Course Name:</label>
+                            <input type="text" class="form-control" id="courseName" name="CourseName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseTeacher">Teacher:</label>
+                            <select class="form-control" id="courseTeacher" name="TeacherID" required>
+                                @foreach (var teacher in Model.Teachers)
+                                {
+                                    <option value="@teacher.TeacherID">@teacher.TeacherName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseBlock">Course Block:</label>
+                            <input type="text" class="form-control" id="courseBlock" name="CourseBlock" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div class="modal fade" id="editCourseModal" tabindex="-1" role="dialog" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCourseModalLabel">Edit Course</h5>
+                    <button type="button" class="close" onclick="hideModal('editCourseModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="@Url.Action("EditCourse", "AdminDashboard")">
+                        <input type="hidden" id="editCourseId" name="CourseID">
+                        <div class="form-group">
+                            <label for="editCourseName">Course Name:</label>
+                            <input type="text" class="form-control" id="editCourseName" name="CourseName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCourseTeacher">Teacher:</label>
+                            <select class="form-control" id="editCourseTeacher" name="TeacherID" required>
+                                @foreach (var teacher in Model.Teachers)
+                                {
+                                    <option value="@teacher.TeacherID">@teacher.TeacherName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCourseBlock">Course Block:</label>
+                            <input type="text" class="form-control" id="editCourseBlock" name="CourseBlock" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Course Modal -->
+    <div class="modal fade" id="deleteCourseModal" tabindex="-1" role="dialog" aria-labelledby="deleteCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCourseModalLabel">Delete Course</h5>
+                    <button type="button" class="close" onclick="hideModal('deleteCourseModal')" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this course?</p>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteCourse()">Delete</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('deleteCourseModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modal Handling and CRUD Operations -->
+    <script>
+        function showModal(modalId, itemId = null) {
+            if (itemId) {
+                document.getElementById(modalId).setAttribute('data-item-id', itemId);
+            }
+            document.getElementById(modalId).style.display = 'block';
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function confirmDeleteStudent() {
+            const modal = document.getElementById('deleteStudentModal');
+            const studentId = modal.getAttribute('data-item-id');
+            deleteStudent(studentId);
+            hideModal('deleteStudentModal');
+        }
+
+        function confirmDeleteTeacher() {
+            const modal = document.getElementById('deleteTeacherModal');
+            const teacherId = modal.getAttribute('data-item-id');
+            deleteTeacher(teacherId);
+            hideModal('deleteTeacherModal');
+        }
+
+        function editStudent(id, name, email) {
+            document.getElementById('editStudentId').value = id;
+            document.getElementById('editStudentName').value = name;
+            document.getElementById('editStudentEmail').value = email;
+            showModal('editStudentModal');
+        }
+
+        function editTeacher(id, name, email) {
+            document.getElementById('editTeacherId').value = id;
+            document.getElementById('editTeacherName').value = name;
+            document.getElementById('editTeacherEmail').value = email;
+            showModal('editTeacherModal');
+        }
+        function editCourse(id, name, teacherId, courseBlock) {
+            document.getElementById('editCourseId').value = id;
+            document.getElementById('editCourseName').value = name;
+            const teacherSelect = document.getElementById('editCourseTeacher');
+            teacherSelect.value = teacherId;
+            document.getElementById('editCourseBlock').value = courseBlock;
+            showModal('editCourseModal');
+        }
+        function confirmDeleteCourse() {
+            const modal = document.getElementById('deleteCourseModal');
+            const courseId = modal.getAttribute('data-item-id');
+            deleteCourse(courseId);
+            hideModal('deleteCourseModal');
+        }
+        async function deleteCourse(id) {
+            try {
+                const response = await fetch('/AdminDashboard/DeleteCourse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `CourseID=${id}`
+                });
+                if (response.ok) {
+                    document.getElementById("course-row-" + id).remove();
+                } else {
+                    console.error('Failed to delete course');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        async function deleteStudent(id) {
+            try {
+                const response = await fetch('/AdminDashboard/DeleteStudent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${id}`
+                });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById("student-row-" + id).remove();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function deleteTeacher(id) {
+            try {
+                const response = await fetch('/AdminDashboard/DeleteTeacher', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${id}`
+                });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById("teacher-row-" + id).remove();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function saveEditedStudent() {
+            const studentId = document.getElementById('editStudentId').value;
+            const studentName = document.getElementById('editStudentName').value;
+            const studentEmail = document.getElementById('editStudentEmail').value;
+
+            try {
+                const response = await fetch('/AdminDashboard/EditStudent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `StudentID=${studentId}&StudentName=${studentName}&StudentEmail=${studentEmail}`
+                });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById("student-row-" + studentId).querySelector("td:nth-child(1)").textContent = studentName;
+                    document.getElementById("student-row-" + studentId).querySelector("td:nth-child(2)").textContent = studentEmail;
+                    hideModal('editStudentModal');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function saveEditedTeacher() {
+            const teacherId = document.getElementById('editTeacherId').value;
+            const teacherName = document.getElementById('editTeacherName').value;
+            const teacherEmail = document.getElementById('editTeacherEmail').value;
+
+            try {
+                const response = await fetch('/AdminDashboard/EditTeacher', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `TeacherID=${teacherId}&TeacherName=${teacherName}&TeacherEmail=${teacherEmail}`
+                });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById("teacher-row-" + teacherId).querySelector("td:nth-child(1)").textContent = teacherName;
+                    document.getElementById("teacher-row-" + teacherId).querySelector("td:nth-child(2)").textContent = teacherEmail;
+                    hideModal('editTeacherModal');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        async function enrollStudent() {
+            const studentId = document.getElementById('studentId').value;
+            const courseId = document.getElementById('courseId').value;
+
+            try {
+                const response = await fetch('/AdminDashboard/EnrollStudent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `StudentID=${studentId}&CourseID=${courseId}`
+                });
+
+                if (response.ok) {
+                    alert('Student enrolled successfully.');
+                    location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.errors.Enrollment || 'Unable to enroll student.'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while enrolling the student.');
+            }
+        }
+    </script>
 </body>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </html>
