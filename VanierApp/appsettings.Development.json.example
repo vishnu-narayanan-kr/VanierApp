@@ -6,7 +6,7 @@
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Data Source=DESKTOP-BS78J0J\\SQLEXPRESS;Initial Catalog=VanierApp;User ID=root;Password=root1;Multiple Active Result Sets=True;Encrypt=False"
+    "DefaultConnection": "YOUR CONNECTION STRING"
   },
   "AllowedHosts": "*"
 }
